@@ -1,7 +1,7 @@
 #[derive(Clone, Debug)]
-struct Cell {
-    value: Option<u8>,
-    possible_values: Vec<u8>,
+pub struct Cell {
+    pub value: Option<u8>,
+    pub possible_values: Vec<u8>,
 }
 
 impl Cell {
@@ -19,8 +19,8 @@ impl Cell {
 }
 
 #[derive(Clone, Debug)]
-struct Board {
-    cells: Vec<Cell>,
+pub struct Board {
+    pub cells: Vec<Cell>,
 }
 
 impl Board {
@@ -57,4 +57,62 @@ impl Board {
     fn is_complete(&self) -> bool {
         self.cells.iter().all(|cell| cell.value.is_some())
     }
+}
+
+pub struct InitialState {
+    known_values: Vec<(usize, usize, u8)>,
+}
+
+impl InitialState {
+    pub fn new(known_values: Vec<(usize, usize, u8)>) -> Self {
+        InitialState {
+            known_values,
+        }
+    }
+
+    fn to_board(&self) -> Board {
+        let mut board = Board::new();
+        self.known_values.iter().for_each(|(row, col, value)| {
+            board.set_value(*row, *col, *value);
+        });
+        board
+    }
+}
+
+pub fn solve(initial_state: InitialState) -> Option<Board> {
+    let mut board = initial_state.to_board();
+    let mut stack = Vec::new();
+    stack.push(board);
+    while !stack.is_empty() {
+        let board = stack.pop().unwrap();
+        if board.is_complete() {
+            return Some(board);
+        }
+
+        let mut board = board.clone();
+        let mut was_change_made = false;
+        loop {
+            let mut change_count = 0;
+            for cell in board.cells.iter_mut() {
+                if let Some(value) = cell.value {
+                    continue;
+                }
+                
+                if cell.possible_values.len() == 1 {
+                    cell.set_value(cell.possible_values[0]);
+                    change_count += 1;
+                }
+            }
+            
+            match change_count {
+                0 => break,
+                _ => was_change_made = true,
+            }
+        }
+
+        if was_change_made {
+            stack.push(board);
+        }
+    }
+    None
 }
