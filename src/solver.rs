@@ -1,3 +1,5 @@
+use std::fmt;
+
 #[derive(Clone, Debug)]
 pub struct Cell {
     pub value: Option<u8>,
@@ -54,7 +56,7 @@ impl Board {
         });
     }
 
-    fn is_complete(&self) -> bool {
+    pub fn is_complete(&self) -> bool {
         self.cells.iter().all(|cell| cell.value.is_some())
     }
 }
@@ -79,40 +81,52 @@ impl InitialState {
     }
 }
 
+impl fmt::Display for Board {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        for row in 0..9 {
+            for col in 0..9 {
+                let index = (row * 9) + col;
+                let value = self.cells[index].value.unwrap_or(0);
+                write!(f, "{}", value)?;
+                if col % 3 == 2 {
+                    write!(f, " ")?;
+                }
+            }
+            writeln!(f)?;
+        }
+        Ok(())
+    }
+}
+
 pub fn solve(initial_state: InitialState) -> Option<Board> {
-    let mut board = initial_state.to_board();
-    let mut stack = Vec::new();
-    stack.push(board);
-    while !stack.is_empty() {
-        let board = stack.pop().unwrap();
-        if board.is_complete() {
-            return Some(board);
-        }
+    let board = initial_state.to_board();
+    solve_recursive(board)
+}
 
-        let mut board = board.clone();
+fn solve_recursive(mut board: Board) -> Option<Board> {
+    while !board.is_complete() {
         let mut was_change_made = false;
-        loop {
-            let mut change_count = 0;
-            for cell in board.cells.iter_mut() {
-                if let Some(value) = cell.value {
-                    continue;
-                }
-                
-                if cell.possible_values.len() == 1 {
-                    cell.set_value(cell.possible_values[0]);
-                    change_count += 1;
-                }
-            }
-            
-            match change_count {
-                0 => break,
-                _ => was_change_made = true,
+        for cell in board.cells.iter_mut() {
+            if cell.possible_values.len() == 1 {
+                cell.set_value(cell.possible_values[0]);
+                was_change_made = true;
             }
         }
 
-        if was_change_made {
-            stack.push(board);
+        if !was_change_made {
+            for (i, cell) in board.cells.iter().enumerate() {
+                for possible_value in cell.possible_values.iter() {
+                    let mut board_with_guess = board.clone();
+                    board_with_guess.set_value(i / 9, i % 9, *possible_value);
+                    if let Some(solved_board) = solve_recursive(board_with_guess) {
+                        return Some(solved_board);
+                    }
+                }
+            }
+
+            return None;
         }
     }
-    None
+
+    Some(board)
 }
