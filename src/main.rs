@@ -24,15 +24,15 @@ fn parse_comma_delimited_string(s: &str) -> solver::InitialState {
 
 fn sample() {
     let initial_state = parse_comma_delimited_string(
-    "1,,3,4,8,,2,7,6\n\
-        2,,5,,,,9,,\n\
-        6,,4,9,1,2,,5,8\n\
-        ,,,,9,8,4,,7\n\
-        ,2,,3,,,,,\n\
-        4,,,,,,,8,3\n\
-        ,4,,,2,3,,6,\n\
-        9,6,,8,5,,,,\n\
-        8,,,,,,7,,");
+        ",,8,,,,,,\n\
+        ,,,,,7,,3,\n\
+        6,1,,5,,,2,,\n\
+        4,,,,,,,,\n\
+        ,,,,5,,,,6\n\
+        2,9,,6,,,1,,\n\
+        9,8,,,3,,,2,\n\
+        ,,4,9,,,,,\n\
+        ,,5,,,,8,,");
 
     let solution = solver::solve(initial_state).expect("No solution found!");
     println!("{solution}");
@@ -43,7 +43,7 @@ mod tests {
     use crate::solver;
 
     #[test]
-    fn test_solver() {
+    fn test_easy() {
         let initial_state = crate::parse_comma_delimited_string(
             "1,,3,4,8,,2,7,6\n\
             2,,5,,,,9,,\n\
@@ -55,6 +55,40 @@ mod tests {
             9,6,,8,5,,,,\n\
             8,,,,,,7,,");
 
+        let solution = solver::solve(initial_state).expect("No solution found!");
+        assert!(solution.is_complete());
+    }
+
+    #[test]
+    fn test_hard() {
+        let initial_state = crate::parse_comma_delimited_string(
+            ",,4,,6,,,,2\n\
+            3,,,5,,,,,7\n\
+            ,,,,,,,,\n\
+            1,,,,8,,,,\n\
+            ,3,,,4,,7,,8\n\
+            5,,,,7,,,,6\n\
+            ,,,,,,1,8,\n\
+            2,,,9,,,,,3\n\
+            ,1,,6,,,,2,");
+        
+        let solution = solver::solve(initial_state).expect("No solution found!");
+        assert!(solution.is_complete());
+    }
+
+    #[test]
+    fn test_evil() {
+        let initial_state = crate::parse_comma_delimited_string(
+            ",,8,,,,,,\n\
+            ,,,,,7,,3,\n\
+            6,1,,5,,,2,,\n\
+            4,,,,,,,,\n\
+            ,,,,5,,,,6\n\
+            2,9,,6,,,1,,\n\
+            9,8,,,3,,,2,\n\
+            ,,4,9,,,,,\n\
+            ,,5,,,,8,,");
+        
         let solution = solver::solve(initial_state).expect("No solution found!");
         assert!(solution.is_complete());
     }
