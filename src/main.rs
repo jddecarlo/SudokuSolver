@@ -24,15 +24,15 @@ fn parse_comma_delimited_string(s: &str) -> solver::InitialState {
 
 fn sample() {
     let initial_state = parse_comma_delimited_string(
-        ",,8,,,,,,\n\
-        ,,,,,7,,3,\n\
-        6,1,,5,,,2,,\n\
-        4,,,,,,,,\n\
-        ,,,,5,,,,6\n\
-        2,9,,6,,,1,,\n\
-        9,8,,,3,,,2,\n\
-        ,,4,9,,,,,\n\
-        ,,5,,,,8,,");
+        ",,,,,,,,\n\
+        ,,,,,,,,\n\
+        ,,,,,,,,\n\
+        ,,,,,,,,\n\
+        ,,,,,,,,\n\
+        ,,,,,,,,\n\
+        ,,,,,,,,\n\
+        ,,,,,,,,\n\
+        1,,2,,,,,,");
 
     let solution = solver::solve(initial_state).expect("No solution found!");
     println!("{solution}");
@@ -88,6 +88,23 @@ mod tests {
             9,8,,,3,,,2,\n\
             ,,4,9,,,,,\n\
             ,,5,,,,8,,");
+        
+        let solution = solver::solve(initial_state).expect("No solution found!");
+        assert!(solution.is_complete());
+    }
+
+    #[test]
+    fn test_dutch_miracle() {
+        let initial_state = crate::parse_comma_delimited_string(
+            ",,,,,,,,\n\
+            ,,,,,,,,\n\
+            ,,,,,,,,\n\
+            ,,,,,,,,\n\
+            ,,,,,,,,\n\
+            ,,,,,,,,\n\
+            ,,,,,,,,\n\
+            ,,,,,,,,\n\
+            1,,2,,,,,,");
         
         let solution = solver::solve(initial_state).expect("No solution found!");
         assert!(solution.is_complete());
